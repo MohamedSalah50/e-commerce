@@ -2,7 +2,7 @@ import { EventEmitter } from 'events';
 import Mail from 'nodemailer/lib/mailer';
 import { verifyEmailTemplate } from '../email/template.email';
 import { sendEmail } from './send.email';
-import { OtpEnum } from 'src/common';
+import { OtpEnum } from 'src/common/enums/otp.enum';
 
 export interface IEmail extends Mail.Options {
   otp: string;
@@ -10,7 +10,6 @@ export interface IEmail extends Mail.Options {
 
 export const emailEmitter = new EventEmitter();
 
-// eslint-disable-next-line @typescript-eslint/no-misused-promises
 emailEmitter.on(OtpEnum.confirmEmail, async (data: IEmail) => {
   try {
     data.subject = OtpEnum.confirmEmail;
@@ -21,7 +20,7 @@ emailEmitter.on(OtpEnum.confirmEmail, async (data: IEmail) => {
   }
 });
 
-// eslint-disable-next-line @typescript-eslint/no-misused-promises
+
 emailEmitter.on(OtpEnum.resetPassword, async (data: IEmail) => {
   try {
     data.subject = OtpEnum.resetPassword;

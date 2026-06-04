@@ -1,14 +1,15 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateBrandDto } from './create-brand.dto';
-import { IsMongoId } from 'class-validator';
+import { IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsPositive, IsString } from 'class-validator';
 import { Types } from 'mongoose';
-// import { contailField } from 'src/common/decorators/update.decorator';
+import { contailField } from 'src/common/decorators/update.decorator';
+import { Type } from 'class-transformer';
 
-// @contailField()
+@contailField()
 export class UpdateBrandDto extends PartialType(CreateBrandDto) { }
 
 
-export class UpdateParamsDto {
+export class BrandParamsDto {
     @IsMongoId()
     brandId: Types.ObjectId;
 }

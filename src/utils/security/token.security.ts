@@ -1,5 +1,4 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/require-await */
+
 import {
   BadRequestException,
   Injectable,
@@ -23,10 +22,10 @@ import { parseObjectId } from './objectId';
 @Injectable()
 export class TokenService {
   constructor(
-    private readonly jwtService: JwtService,
     private readonly userRepository: UserRepository,
+    private readonly jwtService: JwtService,
     private readonly tokenRepository: TokenRepository,
-  ) {}
+  ) { }
   generateToken = async ({
     payload,
     options = {
@@ -40,7 +39,6 @@ export class TokenService {
     return this.jwtService.signAsync(payload, options);
   };
 
-  // eslint-disable-next-line @typescript-eslint/require-await
   verifyToken = async ({
     token,
     options = {
@@ -74,10 +72,10 @@ export class TokenService {
     signatureLevel: SignatureLevelEnum = SignatureLevelEnum.Bearer,
   ): Promise<{ access_Signature: string; refresh_Signature: string }> => {
     const signatures: { access_Signature: string; refresh_Signature: string } =
-      {
-        access_Signature: '',
-        refresh_Signature: '',
-      };
+    {
+      access_Signature: '',
+      refresh_Signature: '',
+    };
 
     switch (signatureLevel) {
       case SignatureLevelEnum.System:
@@ -191,7 +189,7 @@ export class TokenService {
             jti: decoded.jti as string,
             expiredAt: new Date(
               (decoded.iat as number) +
-                Number(process.env.REFRESH_TOKEN_EXPIRES_IN),
+              Number(process.env.REFRESH_TOKEN_EXPIRES_IN),
             ),
             createdBy: parseObjectId(decoded.sub as string),
           },

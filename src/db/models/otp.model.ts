@@ -27,6 +27,9 @@ export type OtpDocument = HydratedDocument<Otp>;
 
 export const OtpSchema = SchemaFactory.createForClass(Otp);
 
+OtpSchema.index({ expiredAt: 1 }, { expireAfterSeconds: 0 });
+
+
 OtpSchema.pre(
   'save',
   async function (
@@ -55,7 +58,6 @@ OtpSchema.post('save', function (doc, next) {
   next();
 });
 
-OtpSchema.index({ expiredAt: 1 }, { expireAfterSeconds: 0 });
 
 export const OtpModel = MongooseModule.forFeature([
   { name: Otp.name, schema: OtpSchema },

@@ -2,15 +2,13 @@ import {
   Controller,
   Get,
   Patch,
-  Headers,
+  // Headers,
   UseInterceptors,
   UploadedFile,
   ParseFilePipe,
   MaxFileSizeValidator,
-  UploadedFiles,
+  // UploadedFiles,
 } from '@nestjs/common';
-import { of, Observable } from 'rxjs';
-import { delay } from 'rxjs/operators';
 import {
   FileInterceptor,
 } from '@nestjs/platform-express';
@@ -30,10 +28,10 @@ export class UserController {
   @UseInterceptors(prefferedLanguage)
   @auth([RoleEnum.admin, RoleEnum.user])
   @Get()
-  profile(@Headers() header: any, @User() user: UserDocument): Observable<any> {
-    return of([{ message: 'Done' }]).pipe(delay(200));
+  async profile(@User() user: UserDocument): Promise<IResponse<ProfileResponse>> {
+    const profile = await this.userService.profile(user);
+    return successResponse<ProfileResponse>({ data: { profile } });
   }
-
   @UseInterceptors(
     FileInterceptor(
       'profileImage',

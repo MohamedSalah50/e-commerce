@@ -1,98 +1,233 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 🛒 E-Commerce REST API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A production-ready **E-Commerce Platform** REST API built with **NestJS** and **TypeScript**, featuring JWT authentication, AWS S3 media storage, Stripe payments, coupon system, cart management, and role-based access control.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## 🚀 Tech Stack
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+| Layer          | Technology                             |
+| -------------- | -------------------------------------- |
+| Framework      | NestJS (TypeScript)                    |
+| Database       | MongoDB + Mongoose                     |
+| Authentication | JWT (Access + Refresh Tokens)          |
+| Cloud Storage  | AWS S3                                 |
+| Payments       | Stripe (Checkout + Webhooks + Refunds) |
+| Email          | Nodemailer + Event Emitter             |
+| Architecture   | Generic Repository Pattern             |
 
-## Project setup
+---
 
-```bash
-$ npm install
+## 📁 Project Structure
+
+```
+src/
+├── common/          # Enums, interfaces, decorators, guards, services
+├── db/              # Mongoose models + generic repository pattern
+├── modules/
+│   ├── auth/        # Authentication
+│   ├── user/        # User profile & wishlist
+│   ├── brand/       # Brand management
+│   ├── category/    # Category management
+│   ├── product/     # Product listings & wishlist
+│   ├── cart/        # Shopping cart
+│   ├── coupon/      # Discount coupons
+│   └── order/       # Orders + Stripe payments
+└── utils/           # Security, email, multer, response helpers
 ```
 
-## Compile and run the project
+---
 
-```bash
-# development
-$ npm run start
+## 🔐 Authentication APIs `POST /auth`
 
-# watch mode
-$ npm run start:dev
+| Method | Endpoint                      | Description                 | Auth   |
+| ------ | ----------------------------- | --------------------------- | ------ |
+| POST   | `/auth/signup`                | Register new user           | Public |
+| PATCH  | `/auth/confirm-email`         | Confirm email via OTP       | Public |
+| POST   | `/auth/resend-confirm-email`  | Resend confirmation OTP     | Public |
+| POST   | `/auth/login`                 | Login with email & password | Public |
+| POST   | `/auth/send/forgot/password`  | Send forgot password OTP    | 🔒     |
+| POST   | `/auth/reset/forgot/password` | Reset password via OTP      | 🔒     |
 
-# production mode
-$ npm run start:prod
+**Security features:**
+
+- Hashed passwords with bcrypt
+- OTP expiry (2 min confirm email, 3 min reset password)
+- `changeCredentialsTime` invalidates old tokens instantly
+
+---
+
+## 👤 User APIs `/user`
+
+| Method | Endpoint              | Description                | Auth          |
+| ------ | --------------------- | -------------------------- | ------------- |
+| GET    | `/user`               | Get profile with wishlist  | 🔒 User/Admin |
+| PATCH  | `/user/profile-image` | Upload profile image to S3 | 🔒 User       |
+
+---
+
+## 🏷️ Brand APIs `/brand`
+
+| Method | Endpoint                     | Description                               | Auth     |
+| ------ | ---------------------------- | ----------------------------------------- | -------- |
+| POST   | `/brand`                     | Create brand                              | 🔒 Admin |
+| PATCH  | `/brand/:brandId`            | Update brand info                         | 🔒 Admin |
+| PATCH  | `/brand/:brandId/attachment` | Update brand image (S3)                   | 🔒 Admin |
+| GET    | `/brand`                     | Get all brands (with search & pagination) | Public   |
+| GET    | `/brand/archived`            | Get all archived brands                   | 🔒 Admin |
+| GET    | `/brand/:brandId`            | Get brand by ID                           | Public   |
+| GET    | `/brand/:brandId/archived`   | Get archived brand by ID                  | Public   |
+| DELETE | `/brand/:brandId/freeze`     | Freeze (soft delete) brand                | 🔒 Admin |
+| PATCH  | `/brand/:brandId/restore`    | Restore frozen brand                      | 🔒 Admin |
+| PATCH  | `/brand/:brandId/remove`     | Permanently delete brand                  | 🔒 Admin |
+
+---
+
+## 📂 Category APIs `/category`
+
+| Method | Endpoint                           | Description                              | Auth     |
+| ------ | ---------------------------------- | ---------------------------------------- | -------- |
+| POST   | `/category`                        | Create category with brands              | 🔒 Admin |
+| PATCH  | `/category/:CategoryId`            | Update category + add/remove brands      | 🔒 Admin |
+| PATCH  | `/category/:CategoryId/attachment` | Update category image (S3)               | 🔒 Admin |
+| GET    | `/category`                        | Get all categories (search & pagination) | Public   |
+| GET    | `/category/archived`               | Get archived categories                  | 🔒 Admin |
+| GET    | `/category/:CategoryId`            | Get category by ID                       | Public   |
+| GET    | `/category/:CategoryId/archived`   | Get archived category by ID              | Public   |
+| DELETE | `/category/:CategoryId/freeze`     | Freeze category                          | 🔒 Admin |
+| PATCH  | `/category/:CategoryId/restore`    | Restore category                         | 🔒 Admin |
+| PATCH  | `/category/:CategoryId/remove`     | Permanently delete category              | 🔒 Admin |
+
+**Note:** Category update uses MongoDB `$setUnion` + `$setDifference` aggregation pipeline to add/remove brands atomically.
+
+---
+
+## 📦 Product APIs `/product`
+
+| Method | Endpoint                                   | Description                                       | Auth     |
+| ------ | ------------------------------------------ | ------------------------------------------------- | -------- |
+| POST   | `/product`                                 | Create product                                    | 🔒 Admin |
+| PATCH  | `/product/:productId`                      | Update product info + auto recalculate sale price | 🔒 Admin |
+| PATCH  | `/product/:productId/attachments`          | Add/remove product images (S3, max 5)             | 🔒 Admin |
+| GET    | `/product`                                 | Get all products (search & pagination)            | Public   |
+| GET    | `/product/archived`                        | Get archived products                             | 🔒 Admin |
+| GET    | `/product/:productId`                      | Get product by ID                                 | Public   |
+| GET    | `/product/:productId/archived`             | Get archived product by ID                        | Public   |
+| DELETE | `/product/:productId/freeze`               | Freeze product                                    | 🔒 Admin |
+| PATCH  | `/product/:productId/restore`              | Restore product                                   | 🔒 Admin |
+| PATCH  | `/product/:productId/remove`               | Permanently delete product                        | 🔒 Admin |
+| PATCH  | `/product/:productId/add-to-wishlist`      | Add to user wishlist                              | 🔒 User  |
+| PATCH  | `/product/:productId/remove-from-wishlist` | Remove from wishlist                              | 🔒 User  |
+
+**Sale price** is auto-calculated: `originalPrice - (originalPrice × discountPercent / 100)`
+
+---
+
+## 🛒 Cart APIs `/cart`
+
+| Method | Endpoint | Description                                 | Auth    |
+| ------ | -------- | ------------------------------------------- | ------- |
+| POST   | `/cart`  | Add product to cart (creates if not exists) | 🔒 User |
+| PATCH  | `/cart`  | Remove products from cart                   | 🔒 User |
+| DELETE | `/cart`  | Clear entire cart                           | 🔒 User |
+| GET    | `/cart`  | Get cart with populated products            | 🔒 User |
+
+---
+
+## 🎟️ Coupon APIs `/coupon`
+
+| Method | Endpoint      | Description                     | Auth     |
+| ------ | ------------- | ------------------------------- | -------- |
+| POST   | `/coupon`     | Create coupon with image upload | 🔒 Admin |
+| GET    | `/coupon`     | Get all coupons                 | 🔒       |
+| GET    | `/coupon/:id` | Get coupon by ID                | 🔒       |
+| PATCH  | `/coupon/:id` | Update coupon                   | 🔒 Admin |
+| DELETE | `/coupon/:id` | Delete coupon                   | 🔒 Admin |
+
+**Coupon types:** percentage discount or fixed amount. Supports usage limit per user (`duration` field).
+
+---
+
+## 📋 Order APIs `/order`
+
+| Method | Endpoint          | Description                                       | Auth    |
+| ------ | ----------------- | ------------------------------------------------- | ------- |
+| POST   | `/order`          | Create order from cart (cash or card)             | 🔒 User |
+| POST   | `/order/:orderId` | Checkout — get Stripe payment session URL         | 🔒 User |
+| PATCH  | `/order/:orderId` | Cancel order + auto restock + refund if paid      | 🔒 User |
+| POST   | `/order/webhook`  | Stripe webhook — confirm payment & mark as placed | Public  |
+
+**Order flow:**
+
+1. User creates order → stock reserved, cart cleared
+2. If card payment → hit checkout to get Stripe session URL
+3. User pays → Stripe webhook confirms → order marked as `placed`
+4. Cancel → stock restored, coupon usage reversed, Stripe refund if applicable
+
+---
+
+## 🗑️ Freeze / Restore / Remove Pattern
+
+Brand, Category, and Product all follow a 3-state lifecycle:
+
+```
+Active → freeze() → Frozen → restore() → Active
+                  → remove() → Permanently Deleted
 ```
 
-## Run tests
+- **freeze**: sets `freezedAt`, document hidden from public queries
+- **restore**: removes `freezedAt`, document becomes active again
+- **remove**: hard delete, only allowed when already frozen
 
-```bash
-# unit tests
-$ npm run test
+---
 
-# e2e tests
-$ npm run test:e2e
+## 🔒 Roles & Permissions
 
-# test coverage
-$ npm run test:cov
+| Role    | Description            |
+| ------- | ---------------------- |
+| `user`  | Regular customer       |
+| `admin` | Platform administrator |
+
+---
+
+## ⚙️ Environment Variables
+
+```env
+PORT=3000
+MONGO_URI=mongodb://...
+ACCESS_SECRET=
+REFRESH_SECRET=
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_REGION=
+AWS_BUCKET_NAME=
+STRIPE_SECRET_KEY=
+STRIPE_WEBHOOK_SECRET=
+EMAIL_USER=
+EMAIL_PASS=
 ```
 
-## Deployment
+---
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## 🏃 Running the App
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+# Install dependencies
+npm install
+
+# Development
+npm run start:dev
+
+# Production
+npm run build
+npm run start:prod
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+---
 
-## Resources
+## 📌 Notes
 
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+- All list endpoints support `?page=1&size=10&search=keyword`
+- Images stored on **AWS S3** — old images deleted automatically on update
+- Stripe webhook validates payment before marking order as placed
+- Generic `DatabaseRepository<T>` base class used across all repositories

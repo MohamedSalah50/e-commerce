@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
 import { DatabaseRepository } from './database.repository';
-import { BrandDocument as TDocument, Brand } from '../models';
+import { Brand, BrandDocument as TDocument } from '../models';
 
 @Injectable()
 export class BrandRepository extends DatabaseRepository<Brand> {

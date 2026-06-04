@@ -22,13 +22,10 @@ import { TokenService } from 'src/utils/security/token.security';
 @Injectable()
 export class AuthService {
   constructor(
-    // eslint-disable-next-line no-unused-vars
     private readonly userRepository: UserRepository,
-    // eslint-disable-next-line no-unused-vars
     private readonly otpRepository: OtpRepository,
-    // eslint-disable-next-line no-unused-vars
     private tokenService: TokenService,
-  ) {}
+  ) { }
 
   private async createConfirmEmailOtp(userId: Types.ObjectId) {
     await this.otpRepository.create({

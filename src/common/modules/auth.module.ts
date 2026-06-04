@@ -1,21 +1,22 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UserModel, UserRepository } from 'src/db';
-import { TokenModel } from 'src/db/models/token.model';
+import { MongooseModule } from '@nestjs/mongoose';
+import {  UserModel, UserRepository } from 'src/db';
+import {  TokenModel } from 'src/db/models/token.model';
 import { TokenRepository } from 'src/db/repository/token.repository';
 import { TokenService } from 'src/utils/security/token.security';
 
+@Global()
 @Module({
-  imports: [UserModel, TokenModel],
+  imports: [UserModel,TokenModel],
   controllers: [],
-  providers: [UserRepository, TokenRepository, JwtService, TokenService],
+  providers: [TokenRepository, UserRepository, JwtService, TokenService],
   exports: [
-    UserRepository,
-    TokenRepository,
     JwtService,
+    TokenRepository,
+    UserRepository,
     TokenService,
-    UserModel,
-    TokenModel,
+    MongooseModule
   ],
 })
-export class SharedAuthenticationModule {}
+export class SharedAuthenticationModule { }

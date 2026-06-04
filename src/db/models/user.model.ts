@@ -6,7 +6,7 @@ import {
   MongooseModule,
 } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
-import { GenderEnum, LanguageEnum, ProviderEnum, RoleEnum } from 'src/common';
+import { GenderEnum, LanguageEnum, ProviderEnum, RoleEnum } from 'src/common/enums';
 import { generateHash } from 'src/utils';
 import { OtpDocument } from './otp.model';
 import { IUser } from 'src/common/interfaces';
@@ -103,6 +103,8 @@ export class User implements IUser {
   @Prop({ type: String })
   profilePicture?: string;
 
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Product' }] })
+  wishList?: Types.ObjectId[];
   @Virtual()
   otp: OtpDocument[];
 }

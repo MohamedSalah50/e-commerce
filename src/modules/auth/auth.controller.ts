@@ -21,8 +21,7 @@ import { auth } from 'src/common/decorators/auth.decorator';
 import { successResponse } from 'src/utils/response';
 
 @Controller('auth')
-export class AuthController {
-  // eslint-disable-next-line no-unused-vars
+export class  AuthController {
   constructor(private readonly authService: AuthService) { }
 
   @Post('/signup')

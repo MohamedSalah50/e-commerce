@@ -2,3 +2,10 @@ export enum storageEnum {
     memory = "memory",
     disk = "disk"
 }
+
+export enum FolderEnum {
+    brand = "brand",
+    category = "category",
+    product = "product",
+    coupon = "coupon"
+}

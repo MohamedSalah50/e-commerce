@@ -15,4 +15,9 @@ export interface IBrand {
 
     createdAt?: Date;
     updatedAt?: Date;
+
+    freezedAt?: Date;
+    // freezedBy?: Types.ObjectId;
+    restoredAt?: Date;
+    // restoredBy?: Types.ObjectId;
 }

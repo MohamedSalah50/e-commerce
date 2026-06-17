@@ -16,6 +16,12 @@ A production-ready **E-Commerce Platform** REST API built with **NestJS** and **
 | Email          | Nodemailer + Event Emitter             |
 | Architecture   | Generic Repository Pattern             |
 
+![NestJS](https://img.shields.io/badge/NestJS-E0234E?style=flat&logo=nestjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=flat&logo=mongodb&logoColor=white)
+![Stripe](https://img.shields.io/badge/Stripe-008CDD?style=flat&logo=stripe&logoColor=white)
+![AWS](https://img.shields.io/badge/AWS_S3-FF9900?style=flat&logo=amazons3&logoColor=white)
+
 ---
 
 ## 📁 Project Structure
@@ -212,6 +218,10 @@ EMAIL_PASS=
 ## 🏃 Running the App
 
 ```bash
+# Clone the repository
+git clone https://github.com/MohamedSalah50/e-commerce.git
+cd e-commerce
+
 # Install dependencies
 npm install
 
@@ -231,3 +241,10 @@ npm run start:prod
 - Images stored on **AWS S3** — old images deleted automatically on update
 - Stripe webhook validates payment before marking order as placed
 - Generic `DatabaseRepository<T>` base class used across all repositories
+
+
+## 📬 Postman Collection
+
+> Test all endpoints with the published collection:
+
+[![Postman](https://img.shields.io/badge/Postman-Collection-FF6C37?style=flat&logo=postman&logoColor=white)](https://documenter.getpostman.com/view/42944447/2sBXwqqVsn)

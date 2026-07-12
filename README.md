@@ -15,12 +15,14 @@ A production-ready **E-Commerce Platform** REST API built with **NestJS** and **
 | Payments       | Stripe (Checkout + Webhooks + Refunds) |
 | Email          | Nodemailer + Event Emitter             |
 | Architecture   | Generic Repository Pattern             |
-
+| Caching        | Redis (RESP3)                          |
+  
 ![NestJS](https://img.shields.io/badge/NestJS-E0234E?style=flat&logo=nestjs&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white)
 ![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=flat&logo=mongodb&logoColor=white)
 ![Stripe](https://img.shields.io/badge/Stripe-008CDD?style=flat&logo=stripe&logoColor=white)
 ![AWS](https://img.shields.io/badge/AWS_S3-FF9900?style=flat&logo=amazons3&logoColor=white)
+![Redis](https://img.shields.io/badge/Redis-DC382D?style=flat&logo=redis&logoColor=white)
 
 ---
 
@@ -172,6 +174,26 @@ src/
 
 ---
 
+## ⚡ Caching (Redis)
+
+Response caching is implemented using **Redis** with a custom interceptor + decorator pattern.
+
+- `@TTL(seconds)` decorator — sets custom cache expiry per route (default: 10s)
+- `RedisCacheInterceptor` — checks Redis before hitting the DB, caches the response after
+- Applied on `GET /product` (findAll) with a 50s TTL
+
+**Example:**
+```typescript
+@TTL(50)
+@UseInterceptors(RedisCacheInterceptor)
+@Get()
+async findAll(@Query() query: GetAllDto) { ... }
+```
+
+Cache key format: `cache:{request.url}`
+
+---
+
 ## 🗑️ Freeze / Restore / Remove Pattern
 
 Brand, Category, and Product all follow a 3-state lifecycle:
@@ -241,6 +263,7 @@ npm run start:prod
 - Images stored on **AWS S3** — old images deleted automatically on update
 - Stripe webhook validates payment before marking order as placed
 - Generic `DatabaseRepository<T>` base class used across all repositories
+- GET `/product` endpoint is cached via Redis (50s TTL) to reduce DB load
 
 
 ## 📬 Postman Collection

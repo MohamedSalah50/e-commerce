@@ -4,7 +4,7 @@ import { OtpDocument } from "src/db";
 import { IProduct } from "./product.interface";
 
 export interface IUser {
-    _id?: Types.ObjectId;
+    _id: Types.ObjectId;
 
 
     firstName: string;
@@ -23,7 +23,7 @@ export interface IUser {
 
     password?: string;
 
-    phone: string;
+    phone?: string;
 
     freezedAt?: Date;
 
@@ -31,7 +31,7 @@ export interface IUser {
 
     restoredAt?: Date;
 
-    restoredBy: Types.ObjectId;
+    restoredBy?: Types.ObjectId;
 
 
     provider: ProviderEnum;

@@ -1,0 +1,115 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+"""User"""
+type OneUserResponse {
+  _id: ID!
+  changeCredentialsTime: DateTime
+  confirmedAt: DateTime
+  createdAt: DateTime
+  updatedAt: DateTime
+  email: String!
+  password: String
+  firstName: String!
+  lastName: String!
+  userName: String
+  profilePicture: String
+  role: RoleEnum!
+  gender: GenderEnum!
+  prefferedLanguage: LanguageEnum!
+  provider: ProviderEnum!
+  wishList: [ID!]
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+enum RoleEnum {
+  user
+  admin
+  superAdmin
+}
+
+enum GenderEnum {
+  male
+  female
+}
+
+enum LanguageEnum {
+  en
+  ar
+}
+
+enum ProviderEnum {
+  Google
+  System
+}
+
+"""get one order product"""
+type OneOrderProductResponse {
+  _id: ID!
+  productId: ID!
+  quantity: Float!
+  unitPrice: Float!
+  finalPrice: Float!
+  createdBy: ID
+  updatedBy: ID
+}
+
+"""get one order"""
+type OneOrderResponse {
+  _id: ID!
+  orderId: String!
+  intentId: String
+  address: String!
+  phone: String!
+  notes: String
+  cancelReason: String
+  coupon: ID
+  discount: Float
+  subTotal: Float!
+  total: Float!
+  paidAt: DateTime
+  paymentIntent: String
+  products: [OneOrderProductResponse!]!
+  status: OrderStatusEnum!
+  paymentType: PaymentEnum!
+  createdBy: OneUserResponse!
+  updatedBy: ID
+}
+
+enum OrderStatusEnum {
+  pending
+  placed
+  onway
+  delivered
+  canceled
+}
+
+enum PaymentEnum {
+  card
+  cash
+}
+
+"""get all orders"""
+type GetAllOrdersResponse {
+  doc_count: Float
+  pages: Float
+  current_page: Float
+  limit: Float
+  result: [OneOrderResponse!]!
+}
+
+type Query {
+  sayHi: String! @deprecated(reason: "first welcome point of graphql")
+  allOrders(data: GetAllGraphDto): GetAllOrdersResponse! @deprecated(reason: "get all orders")
+}
+
+input GetAllGraphDto {
+  page: Float
+  size: Float
+  search: Float
+}

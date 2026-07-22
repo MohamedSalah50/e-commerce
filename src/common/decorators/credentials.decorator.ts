@@ -1,21 +1,25 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import { GqlExecutionContext } from '@nestjs/graphql';
 
 export const User = createParamDecorator(
   (data: unknown, context: ExecutionContext) => {
-    let req: any;
-    switch (context.getType()) {
+    let user: any;
+    switch (context.getType<string>()) {
       case 'http':
-        req = context.switchToHttp().getRequest();
+        user = context.switchToHttp().getRequest().credentials.user;
         break;
-      //   case 'rpc':
-      //     const rpcCtx = context.switchToRpc();
-      //     break;
-      //   case 'ws':
-      //     const wsCtx = context.switchToWs();
-      //     break;
+      case 'ws':
+        user = context.switchToWs().getClient().credentials.user;
+
+        break;
+
+      case 'graphql':
+        user =
+          GqlExecutionContext.create(context).getContext().req.credentials.user;
+        break;
       default:
         break;
     }
-    return req.credentials.user;
+    return user;
   },
 );

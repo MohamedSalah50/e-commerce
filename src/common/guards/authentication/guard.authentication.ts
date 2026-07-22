@@ -3,8 +3,10 @@
 /* eslint-disable no-case-declarations */
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { GqlExecutionContext } from '@nestjs/graphql';
 import { tokenName } from 'src/common/decorators';
 import { tokenEnum } from 'src/common/enums';
+import { getSocketAuth } from 'src/utils/security/socket.security';
 import { TokenService } from 'src/utils/security/token.security';
 
 @Injectable()
@@ -24,19 +26,22 @@ export class AuthenticationGuard implements CanActivate {
 
     let req: any;
     let authorization: string = '';
-    switch (context.getType()) {
+    switch (context.getType<string>()) {
       case 'http':
         const httpCtx = context.switchToHttp();
         req = httpCtx.getRequest();
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         authorization = req.headers.authorization;
         break;
-      //   case 'rpc':
-      //     const rpcCtx = context.switchToRpc();
-      //     break;
-      //   case 'ws':
-      //     const wsCtx = context.switchToWs();
-      //     break;
+      case 'ws':
+        const wsCtx = context.switchToWs();
+        req = wsCtx.getClient();
+        authorization = getSocketAuth(req);
+        console.log(authorization);
+        break;
+      case 'graphql':
+        const graph_ctx = GqlExecutionContext.create(context).getContext().req;
+        authorization = req.headers.authorization;
+        break;
       default:
         break;
     }

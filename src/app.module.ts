@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
-import { resolve } from 'path';
+import { join, resolve } from 'path';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserModule } from './modules/user/user.module';
 import { S3Service } from './common/services';
@@ -15,6 +15,8 @@ import { CartModule } from './modules/cart/cart.module';
 import { CouponModule } from './modules/coupon/coupon.module';
 import { OrderModule } from './modules/order/order.module';
 import { CacheModule } from '@nestjs/cache-manager';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 
 @Module({
   imports: [
@@ -23,6 +25,12 @@ import { CacheModule } from '@nestjs/cache-manager';
       isGlobal: true,
     }),
     CacheModule.register({ ttl: 5000, isGlobal: true }),
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      graphiql: true,
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+    }),
+
     MongooseModule.forRoot(process.env.MONGO_URI as string, {
       connectionFactory: (connection) => {
         console.log('✅ Connected to MongoDB:', connection.name);

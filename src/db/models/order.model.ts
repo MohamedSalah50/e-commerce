@@ -4,8 +4,12 @@ import slugify from 'slugify';
 import { OrderStatusEnum, PaymentEnum } from 'src/common/enums/order.enum';
 import { IOrder, IOrderProduct, IUser } from 'src/common/interfaces';
 
-
-@Schema({ timestamps: true, strictQuery: true, toJSON: { virtuals: true }, toObject: { virtuals: true } })
+@Schema({
+  timestamps: true,
+  strictQuery: true,
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true },
+})
 export class OrderProduct implements IOrderProduct {
   @Prop({ type: Types.ObjectId, ref: 'Product', required: true })
   productId: Types.ObjectId;
@@ -17,10 +21,10 @@ export class OrderProduct implements IOrderProduct {
   finalPrice: number;
 }
 
-
 @Schema({ timestamps: true, strictQuery: true })
 export class Order implements IOrder {
-
+  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
+  _id: Types.ObjectId;
   @Prop({ type: String, required: true, unique: true })
   orderId: string;
 
@@ -33,8 +37,7 @@ export class Order implements IOrder {
   @Prop({ type: String, required: false })
   cancelReason?: string;
   @Prop({ type: String })
-  intentId: string
-
+  intentId: string;
 
   @Prop({ type: Types.ObjectId, ref: 'Coupon' })
   coupon?: Types.ObjectId;
@@ -46,8 +49,6 @@ export class Order implements IOrder {
   @Prop({ type: Number })
   subTotal: number;
 
-
-
   @Prop({ type: Date, required: false })
   paidAt?: Date;
   @Prop({ type: String, required: false })
@@ -56,9 +57,13 @@ export class Order implements IOrder {
   @Prop({ type: String, enum: PaymentEnum, default: PaymentEnum.cash })
   paymentType: PaymentEnum;
   @Prop({
-    type: String, enum: OrderStatusEnum, default: function (this: Order) {
-      return this.paymentType === PaymentEnum.cash ? OrderStatusEnum.pending : OrderStatusEnum.placed
-    }
+    type: String,
+    enum: OrderStatusEnum,
+    default: function (this: Order) {
+      return this.paymentType === PaymentEnum.cash
+        ? OrderStatusEnum.pending
+        : OrderStatusEnum.placed;
+    },
   })
   status: OrderStatusEnum;
 
@@ -79,45 +84,41 @@ export type OrderDocument = HydratedDocument<Order>;
 
 export const OrderSchema = SchemaFactory.createForClass(Order);
 
-OrderSchema.pre("save", async function (next) {
-
+OrderSchema.pre('save', async function (next) {
   if (this.isModified('total')) {
-    this.subTotal = this.total - (this.total * this.discount);
+    this.subTotal = this.total - this.total * this.discount;
   }
   next();
-})
+});
 
 OrderSchema.pre(['updateOne', 'findOneAndUpdate'], async function (next) {
   const update = this.getUpdate() as UpdateQuery<OrderDocument>;
 
   if (update.name) {
-    this.setUpdate({ ...update, slug: slugify(update.name) })
+    this.setUpdate({ ...update, slug: slugify(update.name) });
   }
   const query = this.getQuery();
 
   if (query.paranoId === false) {
-    this.setQuery({ ...query })
+    this.setQuery({ ...query });
   } else {
-    this.setQuery({ ...query, freezedAt: { $exists: false } })
+    this.setQuery({ ...query, freezedAt: { $exists: false } });
   }
 
   next();
-})
-
-
+});
 
 OrderSchema.pre(['findOne', 'find'], async function (next) {
   const query = this.getQuery();
 
   if (query.paranoId === false) {
-    this.setQuery({ ...query })
+    this.setQuery({ ...query });
   } else {
-    this.setQuery({ ...query, freezedAt: { $exists: false } })
+    this.setQuery({ ...query, freezedAt: { $exists: false } });
   }
 
   next();
-})
-
+});
 
 export const OrderModel = MongooseModule.forFeature([
   { name: Order.name, schema: OrderSchema },

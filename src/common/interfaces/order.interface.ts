@@ -25,7 +25,7 @@ export interface IOrderProduct {
 }
 
 export interface IOrder {
-    _id?: Types.ObjectId;
+    _id: Types.ObjectId;
     orderId:string;
     address: string;
     phone: string;

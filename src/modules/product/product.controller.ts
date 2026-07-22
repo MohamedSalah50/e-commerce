@@ -37,30 +37,19 @@ import {
 import { endpoint } from './authorization.product';
 import { productResponse } from './entities/product.entity';
 import { successResponse } from 'src/utils/response';
-import { type RedisClientType } from 'redis';
-import { RedisCacheInterceptor } from 'src/common/interceptors/cache.interceptor';
+// import { type RedisClientType } from 'redis';
+// import { RedisCacheInterceptor } from 'src/common/interceptors/cache.interceptor';
 import { Observable, of } from 'rxjs';
 
 @Controller('product')
 export class ProductController {
   constructor(
-    @Inject('REDIS_CLIENT') private readonly redisClient: RedisClientType,
+    // @Inject('REDIS_CLIENT') private readonly redisClient: RedisClientType,
     private readonly productService: ProductService,
   ) {}
 
   @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
-  @Get('test')
-  async test() {
-    let user = JSON.parse((await this.redisClient.get('user')) as string);
-
-    if (!user) {
-      user = { message: `done at ${Date.now()}`, name: 'medo' };
-      await this.redisClient.set('user', JSON.stringify(user), { EX: 10 });
-    }
-
-    return user;
-  }
-
+  
   // @UseInterceptors(FilesInterceptor('attachments', 5, cloudFileUpload({ validation: fileValidation.image, storageAppraoch: storageEnum.disk })))
   @auth(endpoint.create)
   @Post()
@@ -123,8 +112,8 @@ export class ProductController {
     });
   }
 
-  @TTL(50)
-  @UseInterceptors(RedisCacheInterceptor)
+  // @TTL(50)
+  // @UseInterceptors(RedisCacheInterceptor)
   @Get()
   async findAll(
     @Query() query: GetAllDto,

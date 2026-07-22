@@ -20,6 +20,8 @@ export type HUserDocument = HydratedDocument<User>;
   toObject: { virtuals: true },
 })
 export class User implements IUser {
+  @Prop({ required: true })
+  _id: Types.ObjectId;
   @Prop({ required: true, minlength: 2, maxlength: 20 })
   firstName: string;
 

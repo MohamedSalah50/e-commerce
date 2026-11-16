@@ -7,6 +7,7 @@ import {
   UploadedFile,
   ParseFilePipe,
   MaxFileSizeValidator,
+  UseGuards,
   // UploadedFiles,
 } from '@nestjs/common';
 import {

@@ -12,7 +12,7 @@ import { TokenService } from 'src/utils/security/token.security';
 @Injectable()
 export class AuthenticationGuard implements CanActivate {
   constructor(
-    private readonly tokensService: TokenService,
+    private readonly tokenService: TokenService,
     private readonly reflector: Reflector,
   ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -22,35 +22,32 @@ export class AuthenticationGuard implements CanActivate {
         context.getClass(),
       ]) ?? tokenEnum.access;
 
-    // console.log({ context, tokenType });
-
     let req: any;
     let authorization: string = '';
-    switch (context.getType<string>()) {
+    switch (context.getType()) {
       case 'http':
         const httpCtx = context.switchToHttp();
         req = httpCtx.getRequest();
-        authorization = req.headers.authorization;
+        authorization = req.headers.authorization ?? '';
         break;
-      case 'ws':
-        const wsCtx = context.switchToWs();
-        req = wsCtx.getClient();
-        authorization = getSocketAuth(req);
-        console.log(authorization);
-        break;
-      case 'graphql':
-        const graph_ctx = GqlExecutionContext.create(context).getContext().req;
-        authorization = req.headers.authorization;
-        break;
+      //   case 'ws':
+      // const wsCtx = context.switchToWs();
+      //   req = wsCtx.getClient();
+      //   break;
+      //   case 'graphql':
+      // const gqlCtx = GqlExecutionContext.create(context);
+      //   req = GqlExecutionContext.create(context).getContext().req;
       default:
         break;
     }
-    const { user, decoded } = await this.tokensService.decodeToken({
+
+    const { decoded, user } = await this.tokenService.decodeToken({
       authorization,
-      tokenType: tokenEnum.access,
+      tokenType,
     });
 
     req.credentials = { user, decoded };
+
     return true;
   }
 }

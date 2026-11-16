@@ -35,8 +35,8 @@ export class  AuthController {
     )
     dto: SignupDto,
   ): Promise<IResponse> {
-    await this.authService.signup(dto);
-    return successResponse()
+    return await this.authService.signup(dto);
+    // return successResponse()
   }
 
   @Patch('/confirm-email')

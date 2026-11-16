@@ -7,18 +7,16 @@ import {
 } from 'class-validator';
 import { Types } from 'mongoose';
 
-
 @ValidatorConstraint({ name: 'check_valid_ids', async: false })
 export class MongoDbIds implements ValidatorConstraintInterface {
   validate(ids: Types.ObjectId[], args: ValidationArguments) {
     for (const id of ids) {
-
       if (!Types.ObjectId.isValid(id)) {
-        return false
+        return false;
       }
     }
 
-    return true
+    return true;
   }
 
   defaultMessage(ValidationArguments?: ValidationArguments): string {
@@ -39,7 +37,7 @@ export class IsMatchedMethod<T = any> implements ValidatorConstraintInterface {
   }
 
   defaultMessage(ValidationArguments?: ValidationArguments): string {
-    return 'not matched fields';
+    return `src field ${ValidationArguments?.property} does not match target field ${ValidationArguments?.constraints[0]}`;
   }
 }
 

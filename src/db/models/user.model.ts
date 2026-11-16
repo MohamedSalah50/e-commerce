@@ -6,7 +6,12 @@ import {
   MongooseModule,
 } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
-import { GenderEnum, LanguageEnum, ProviderEnum, RoleEnum } from 'src/common/enums';
+import {
+  GenderEnum,
+  LanguageEnum,
+  ProviderEnum,
+  RoleEnum,
+} from 'src/common/enums';
 import { generateHash } from 'src/utils';
 import { OtpDocument } from './otp.model';
 import { IUser } from 'src/common/interfaces';
@@ -33,7 +38,7 @@ export class User implements IUser {
       return this.firstName + ' ' + this.lastName;
     },
     set: function (value: string) {
-      const [firstName, lastName] = value.split(' ');
+      const [firstName, lastName] = value.split(' ') || [];
       this.set({ firstName, lastName });
     },
   })
@@ -50,6 +55,13 @@ export class User implements IUser {
     required: false,
   })
   confirmedAt?: Date;
+
+  @Prop({
+    type: String,
+    enum: ProviderEnum,
+    default: ProviderEnum.System,
+  })
+  provider: ProviderEnum;
 
   @Prop({
     required: function () {
@@ -72,13 +84,6 @@ export class User implements IUser {
 
   @Prop({ type: Types.ObjectId, ref: 'User' })
   restoredBy: Types.ObjectId;
-
-  @Prop({
-    type: String,
-    enum: ProviderEnum,
-    default: ProviderEnum.System,
-  })
-  provider: ProviderEnum;
 
   @Prop({
     type: String,

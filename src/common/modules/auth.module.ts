@@ -5,7 +5,7 @@ import { UserModel, UserRepository } from 'src/db';
 import { TokenModel } from 'src/db/models/token.model';
 import { TokenRepository } from 'src/db/repository/token.repository';
 import { TokenService } from 'src/utils/security/token.security';
-import { createClient } from 'redis';
+// import { createClient } from 'redis';
 
 @Global()
 @Module({
@@ -16,19 +16,19 @@ import { createClient } from 'redis';
     UserRepository,
     JwtService,
     TokenService,
-    {
-      provide: 'REDIS_CLIENT',
-      useFactory: async () => {
-        const client = createClient({
-          url: 'redis://localhost:6379',
-        });
-        client.on('error', (err) => console.error('redis client error', err));
-        await client.connect();
-        console.log('✅ redis connected');
+    // {
+    //   provide: 'REDIS_CLIENT',
+    //   useFactory: async () => {
+    //     const client = createClient({
+    //       url: 'redis://localhost:6379',
+    //     });
+    //     client.on('error', (err) => console.error('redis client error', err));
+    //     await client.connect();
+    //     console.log('✅ redis connected');
 
-        return client;
-      },
-    },
+    //     return client;
+    //   },
+    // },
   ],
   exports: [
     JwtService,
@@ -36,7 +36,7 @@ import { createClient } from 'redis';
     UserRepository,
     TokenService,
     MongooseModule,
-    'REDIS_CLIENT',
+    // 'REDIS_CLIENT',
   ],
 })
 export class SharedAuthenticationModule {}

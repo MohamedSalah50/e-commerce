@@ -6,8 +6,22 @@ import {
   IsStrongPassword,
   MaxLength,
   MinLength,
+  ValidateIf,
+  ValidationArguments,
+  ValidatorConstraint,
+  ValidatorConstraintInterface,
 } from 'class-validator';
 import { GenderEnum, IsMatched } from 'src/common';
+
+@ValidatorConstraint({ name: 'MatchBetweenFields', async: false })
+export class MatchBetweenFields implements ValidatorConstraintInterface {
+  validate(value: any, args: ValidationArguments) {
+    return value === args.object['password'];
+  }
+  defaultMessage(validationArguments?: ValidationArguments): string {
+    return 'password and confirmPassword mismatched';
+  }
+}
 
 export class SignupDto {
   @IsString()
@@ -22,12 +36,6 @@ export class SignupDto {
   @MaxLength(20)
   lastName: string;
 
-  // @IsString()
-  // @IsNotEmpty()
-  // @MinLength(2)
-  // @MaxLength(20)
-  // userName: string;
-
   @IsEmail()
   email: string;
 
@@ -38,6 +46,9 @@ export class SignupDto {
 
   @IsString()
   @MinLength(6)
+  @ValidateIf((data: SignupDto) => {
+    return Boolean(data.password);
+  })
   @IsMatched<string>(['password'], {
     message: 'password and confirmPassword mismatched',
   })

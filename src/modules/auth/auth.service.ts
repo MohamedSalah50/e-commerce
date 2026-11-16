@@ -25,7 +25,7 @@ export class AuthService {
     private readonly userRepository: UserRepository,
     private readonly otpRepository: OtpRepository,
     private tokenService: TokenService,
-  ) { }
+  ) {}
 
   private async createConfirmEmailOtp(userId: Types.ObjectId) {
     await this.otpRepository.create({
@@ -45,11 +45,15 @@ export class AuthService {
     const existingUser = await this.userRepository.findOne({
       filter: { email },
     });
-    if (existingUser) throw new ConflictException('user already existssss');
+    
+    if (existingUser) throw new ConflictException('user already exists');
+
+    const userId = new Types.ObjectId();
 
     const [user] = await this.userRepository.create({
       data: [
         {
+          _id: userId,
           firstName,
           lastName,
           email,
@@ -78,7 +82,7 @@ export class AuthService {
         populate: [{ path: 'otp', match: { type: OtpEnum.confirmEmail } }],
       },
     });
-    if (!user) throw new ConflictException('user already exists');
+    if (!user) throw new ConflictException('fail to find matching account');
 
     if (user.otp?.length) {
       throw new ConflictException(

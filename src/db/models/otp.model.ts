@@ -1,32 +1,23 @@
-import { MongooseModule, Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Types } from 'mongoose';
-import { OtpEnum } from 'src/common';
-import { IOtp } from 'src/common/interfaces';
-import { emailEmitter, generateHash } from 'src/utils';
+import { MongooseModule, Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { HydratedDocument, Types } from "mongoose";
+import { IOtp, IUser, OtpEnum } from "src/common";
+import { emailEmitter, generateHash } from "src/utils";
+
 
 @Schema({ timestamps: true })
-export class Otp implements IOtp {
-  @Prop({ type: String, required: true })
-  code: string;
-
-  @Prop({ type: Date, required: true })
+export class Otp implements IOtp{
+  @Prop({ required: true , type: String })
+  code:string;
+  @Prop({ required: true , type: String })
   expiredAt: Date;
-
-  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
-  createdBy: Types.ObjectId;
-
-  @Prop({
-    type: String,
-    enum: OtpEnum,
-    required: true,
-  })
-  type: OtpEnum;
+  @Prop({ required: true , type: Types.ObjectId , ref: 'User' })
+  createdBy: Types.ObjectId | IUser;
+  @Prop({ required: true , type: String , enum: OtpEnum })
+  type: OtpEnum
 }
 
 export type OtpDocument = HydratedDocument<Otp>;
-
-export const OtpSchema = SchemaFactory.createForClass(Otp);
-
+export const OtpSchema  = SchemaFactory.createForClass(Otp);
 OtpSchema.index({ expiredAt: 1 }, { expireAfterSeconds: 0 });
 
 
@@ -59,6 +50,9 @@ OtpSchema.post('save', function (doc, next) {
 });
 
 
-export const OtpModel = MongooseModule.forFeature([
-  { name: Otp.name, schema: OtpSchema },
-]);
+
+export const OtpModel = MongooseModule.forFeature([{ name: Otp.name, schema: OtpSchema }]) 
+
+
+
+
